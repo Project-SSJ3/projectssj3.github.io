@@ -1,487 +1,284 @@
+<!-- PWA CONFIG -->
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#e94560">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SSJ3 BOT-Z - Tournoi Légendaire</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<!-- STYLE PWA & BOUTONS -->
+<style>
+  /* BOUTON INSTALLATION PWA */
+  .pwa-install-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #e94560, #d43a55);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+    z-index: 1000;
+    transition: all 0.3s;
+    display: none;
+  }
+  
+  .pwa-install-btn.show {
+    display: block;
+  }
+  
+  .pwa-install-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(233, 69, 96, 0.6);
+  }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            color: white;
-            min-height: 100vh;
-            padding: 20px;
-        }
+  /* BOUTONS INTERACTIFS */
+  .interactive-btn {
+    background: linear-gradient(135deg, #5865F2, #7983f5);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 10px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
+  }
+  
+  .interactive-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(88, 101, 242, 0.5);
+  }
+  
+  .interactive-btn:active {
+    transform: translateY(-1px);
+  }
+  
+  .btn-success {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+  }
+  
+  .btn-warning {
+    background: linear-gradient(135deg, #ff9800, #e68900);
+  }
+  
+  /* ANIMATIONS */
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  .pulse {
+    animation: pulse 2s infinite;
+  }
+  
+  /* STATS COUNTER */
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #e94560;
+    transition: all 0.5s;
+  }
+  
+  /* TOURNAMENT BRACKET */
+  .bracket-match {
+    background: rgba(30, 30, 46, 0.8);
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border-left: 4px solid #e94560;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  
+  .bracket-match:hover {
+    transform: translateX(5px);
+    background: rgba(40, 40, 60, 0.9);
+  }
+</style>
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+<!-- SECTION BOUTONS INTERACTIFS -->
+<section style="padding: 40px 0; text-align: center;">
+  <h2>🚀 Actions Rapides</h2>
+  <div style="margin: 20px 0;">
+    <button class="interactive-btn pulse" onclick="joinTournament()">
+      🎮 Rejoindre Tournoi
+    </button>
+    
+    <button class="interactive-btn btn-success" onclick="showStats()">
+      📊 Voir Stats
+    </button>
+    
+    <button class="interactive-btn btn-warning" onclick="simulateBattle()">
+      ⚔️ Simuler Combat
+    </button>
+    
+    <button class="interactive-btn" onclick="shareServer()">
+      📣 Partager Serveur
+    </button>
+  </div>
+</section>
 
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            border: 2px solid #ffd700;
-        }
-
-        .title {
-            font-size: 3em;
-            color: #ffd700;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .subtitle {
-            font-size: 1.2em;
-            color: #ff6b6b;
-            margin-bottom: 20px;
-        }
-
-        .rules {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            border-left: 4px solid #ff6b6b;
-        }
-
-        .rules h2 {
-            color: #ffd700;
-            margin-bottom: 15px;
-        }
-
-        .rules ul {
-            list-style: none;
-            padding-left: 20px;
-        }
-
-        .rules li {
-            margin-bottom: 10px;
-            padding-left: 25px;
-            position: relative;
-        }
-
-        .rules li:before {
-            content: "⚡";
-            position: absolute;
-            left: 0;
-            color: #ffd700;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #ffd700;
-            font-weight: bold;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.9);
-            font-size: 16px;
-        }
-
-        button {
-            background: linear-gradient(45deg, #ff6b6b, #ffd700);
-            color: #1a1a2e;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            width: 100%;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-        }
-
-        .participants-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .participant {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            border-left: 4px solid #ffd700;
-        }
-
-        .participant-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .participant-name {
-            font-weight: bold;
-            color: #ffd700;
-        }
-
-        .participant-stats {
-            font-size: 0.9em;
-            color: #ccc;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff6b6b, #ffd700);
-            border-radius: 10px;
-            transition: width 0.5s ease;
-        }
-
-        .leaderboard {
-            margin-top: 40px;
-        }
-
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            margin-bottom: 10px;
-            border-radius: 8px;
-            border-left: 4px solid;
-        }
-
-        .rank-1 { border-left-color: #ffd700; background: rgba(255, 215, 0, 0.1); }
-        .rank-2 { border-left-color: #c0c0c0; background: rgba(192, 192, 192, 0.1); }
-        .rank-3 { border-left-color: #cd7f32; background: rgba(205, 127, 50, 0.1); }
-
-        .rank {
-            font-weight: bold;
-            font-size: 1.2em;
-            color: #ffd700;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            background: #4CAF50;
-            color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .dragon-ball {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            background: radial-gradient(circle at 30% 30%, #ff6b6b, #ff0000);
-            border-radius: 50%;
-            border: 2px solid #ffd700;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-    </style>
-</head>
-<body>
-    <div class="dragon-ball" style="top: 10%; left: 5%;"></div>
-    <div class="dragon-ball" style="top: 20%; right: 10%; animation-delay: 0.5s;"></div>
-    <div class="dragon-ball" style="bottom: 15%; left: 15%; animation-delay: 1s;"></div>
-
-    <div class="container">
-        <div class="header">
-            <h1 class="title">SSJ3 BOT-Z TOURNOI</h1>
-            <p class="subtitle">Affrontez les meilleurs guerriers et remportez 50K Zenis !</p>
-        </div>
-
-        <div class="rules">
-            <h2>⚡ Règles du Tournoi</h2>
-            <ul>
-                <li>Inscrivez-vous avec votre pseudo Discord</li>
-                <li>3 victoires dans un match = 1 POINT</li>
-                <li>Le premier à atteindre 3 victoires remporte le match</li>
-                <li>100 POINTS = 50,000 ZENIS de récompense !</li>
-                <li>Respect et fair-play obligatoires</li>
-            </ul>
-        </div>
-
-        <div class="main-content">
-            <div class="card">
-                <h2 style="color: #ffd700; margin-bottom: 20px;">🎯 Inscription au Tournoi</h2>
-                <form id="registrationForm">
-                    <div class="form-group">
-                        <label for="discordName">Pseudo Discord *</label>
-                        <input type="text" id="discordName" required placeholder="Ex: SonGoku#1234">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="character">Personnage Principal</label>
-                        <select id="character">
-                            <option value="goku">Son Goku</option>
-                            <option value="vegeta">Vegeta</option>
-                            <option value="gohan">Son Gohan</option>
-                            <option value="frieza">Freezer</option>
-                            <option value="cell">Cell</option>
-                            <option value="buu">Boo</option>
-                            <option value="broly">Broly</option>
-                            <option value="other">Autre</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="level">Niveau Estimé</label>
-                        <select id="level">
-                            <option value="beginner">Débutant</option>
-                            <option value="intermediate">Intermédiaire</option>
-                            <option value="advanced">Avancé</option>
-                            <option value="pro">Pro</option>
-                        </select>
-                    </div>
-
-                    <button type="submit">🚀 S'INSCRIRE AU TOURNOI</button>
-                </form>
-            </div>
-
-            <div class="card">
-                <h2 style="color: #ffd700; margin-bottom: 20px;">🏆 Participants</h2>
-                <div class="participants-list" id="participantsList">
-                    <!-- Les participants seront ajoutés ici dynamiquement -->
-                </div>
-            </div>
-        </div>
-
-        <div class="card leaderboard">
-            <h2 style="color: #ffd700; margin-bottom: 20px;">📊 Classement en Temps Réel</h2>
-            <div id="leaderboard">
-                <!-- Le classement sera généré ici -->
-            </div>
-        </div>
+<!-- SECTION STATS LIVE -->
+<section style="padding: 40px 0; text-align: center; background: rgba(0,0,0,0.3);">
+  <h2>📈 Statistiques en Direct</h2>
+  <div style="display: flex; justify-content: center; gap: 30px; margin: 30px 0;">
+    <div>
+      <div class="stat-number" id="onlineCount">72</div>
+      <div>En Ligne</div>
     </div>
-
-    <div class="notification" id="notification">
-        Inscription réussie ! Bienvenue dans le tournoi !
+    <div>
+      <div class="stat-number" id="tournamentCount">3</div>
+      <div>Tournois Actifs</div>
     </div>
+    <div>
+      <div class="stat-number" id="battleCount">156</div>
+      <div>Combats Today</div>
+    </div>
+  </div>
+</section>
 
-    <script>
-        // Stockage des participants
-        let participants = JSON.parse(localStorage.getItem('tournamentParticipants')) || [];
+<!-- SECTION SIMULATION TOURNOI -->
+<section style="padding: 40px 0;">
+  <h2 style="text-align: center;">🏆 Arbre du Tournoi</h2>
+  <div style="max-width: 600px; margin: 0 auto;">
+    <div class="bracket-match" onclick="showMatchDetails(1)">
+      <strong>Match 1:</strong> SonGoku vs Vegeta
+      <div style="color: #b8b8b8; font-size: 0.9em;">En attente...</div>
+    </div>
+    
+    <div class="bracket-match" onclick="showMatchDetails(2)">
+      <strong>Match 2:</strong> Freezer vs Cell  
+      <div style="color: #b8b8b8; font-size: 0.9em;">En cours...</div>
+    </div>
+    
+    <div class="bracket-match" onclick="showMatchDetails(3)">
+      <strong>Match 3:</strong> Boo vs Sangohan
+      <div style="color: #4CAF50; font-size: 0.9em;">Terminé - Boo gagne!</div>
+    </div>
+  </div>
+</section>
+<!-- BOUTON INSTALLATION PWA -->
+<button class="pwa-install-btn" id="installButton">
+  📱 Installer l'App
+</button>
 
-        // Éléments DOM
-        const registrationForm = document.getElementById('registrationForm');
-        const participantsList = document.getElementById('participantsList');
-        const leaderboard = document.getElementById('leaderboard');
-        const notification = document.getElementById('notification');
+<!-- SCRIPT PWA + INTERACTIONS -->
+<script>
+  // === PWA FUNCTIONALITY ===
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('🔄 PWA Ready!'))
+      .catch(err => console.log('❌ PWA Error:', err));
+  }
 
-        // Fonction pour afficher les notifications
-        function showNotification(message) {
-            notification.textContent = message;
-            notification.classList.add('show');
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
+  let deferredPrompt;
+  const installButton = document.getElementById('installButton');
 
-        // Fonction pour afficher les participants
-        function displayParticipants() {
-            participantsList.innerHTML = '';
-            participants.forEach((participant, index) => {
-                const progressPercentage = (participant.points / 100) * 100;
-                
-                const participantElement = document.createElement('div');
-                participantElement.className = 'participant';
-                participantElement.innerHTML = `
-                    <div class="participant-header">
-                        <span class="participant-name">${participant.name}</span>
-                        <span class="participant-stats">${participant.points} POINTS</span>
-                    </div>
-                    <div>Personnage: ${getCharacterName(participant.character)}</div>
-                    <div>Niveau: ${getLevelName(participant.level)}</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${progressPercentage}%"></div>
-                    </div>
-                    <small>${100 - participant.points} points restants pour 50K Zenis</small>
-                `;
-                participantsList.appendChild(participantElement);
-            });
-        }
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installButton.classList.add('show');
+  });
 
-        // Fonction pour mettre à jour le classement
-        function updateLeaderboard() {
-            leaderboard.innerHTML = '';
-            
-            // Trier par points (décroissant)
-            const sortedParticipants = [...participants].sort((a, b) => b.points - a.points);
-            
-            sortedParticipants.forEach((participant, index) => {
-                const rankClass = index < 3 ? `rank-${index + 1}` : '';
-                const rankElement = document.createElement('div');
-                rankElement.className = `leaderboard-item ${rankClass}`;
-                rankElement.innerHTML = `
-                    <div>
-                        <span class="rank">#${index + 1}</span>
-                        <strong>${participant.name}</strong>
-                    </div>
-                    <div>
-                        <strong>${participant.points} POINTS</strong>
-                        <div style="font-size: 0.8em; color: #ccc;">${getCharacterName(participant.character)}</div>
-                    </div>
-                `;
-                leaderboard.appendChild(rankElement);
-            });
-        }
+  installButton.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      installButton.textContent = '✅ Installé!';
+      installButton.style.background = '#4CAF50';
+    }
+    
+    deferredPrompt = null;
+    setTimeout(() => installButton.classList.remove('show'), 3000);
+  });
 
-        // Helper functions
-        function getCharacterName(character) {
-            const characters = {
-                'goku': 'Son Goku',
-                'vegeta': 'Vegeta',
-                'gohan': 'Son Gohan',
-                'frieza': 'Freezer',
-                'cell': 'Cell',
-                'buu': 'Boo',
-                'broly': 'Broly',
-                'other': 'Autre'
-            };
-            return characters[character] || 'Inconnu';
-        }
+  // === INTERACTIVE BUTTON FUNCTIONS ===
+  function joinTournament() {
+    const btn = event.target;
+    btn.innerHTML = '🎮 Inscription...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+      btn.innerHTML = '✅ Inscrit!';
+      btn.style.background = 'linear-gradient(135deg, #4CAF50, #45a049)';
+      alert('🎉 Bienvenue dans le tournoi! Vérifiez vos MP Discord.');
+    }, 1500);
+  }
 
-        function getLevelName(level) {
-            const levels = {
-                'beginner': 'Débutant',
-                'intermediate': 'Intermédiaire',
-                'advanced': 'Avancé',
-                'pro': 'Professionnel'
-            };
-            return levels[level] || 'Inconnu';
-        }
+  function showStats() {
+    // Animation des compteurs
+    animateCounter('onlineCount', 72, 85, 2000);
+    animateCounter('tournamentCount', 3, 5, 1500); 
+    animateCounter('battleCount', 156, 189, 2500);
+    
+    alert('📈 Statistiques mises à jour!');
+  }
 
-        // Gestion de l'inscription
-        registrationForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const discordName = document.getElementById('discordName').value.trim();
-            const character = document.getElementById('character').value;
-            const level = document.getElementById('level').value;
+  function simulateBattle() {
+    const fighters = ['SonGoku', 'Vegeta', 'Freezer', 'Cell', 'Boo', 'Sangohan'];
+    const player1 = fighters[Math.floor(Math.random() * fighters.length)];
+    const player2 = fighters[Math.floor(Math.random() * fighters.length)];
+    const winner = Math.random() > 0.5 ? player1 : player2;
+    
+    alert(`⚔️ COMBAT SIMULÉ:\n${player1} vs ${player2}\n🎊 VAINQUEUR: ${winner}`);
+  }
 
-            // Vérifier si le participant existe déjà
-            const existingParticipant = participants.find(p => p.name === discordName);
-            if (existingParticipant) {
-                showNotification('Vous êtes déjà inscrit au tournoi !');
-                return;
-            }
+  function shareServer() {
+    const inviteLink = 'https://discord.gg/ssj3botz';
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'SSJ3 BOT-Z Discord',
+        text: 'Rejoins le serveur Dragon Ball!',
+        url: inviteLink
+      });
+    } else {
+      navigator.clipboard.writeText(inviteLink);
+      alert('📋 Lien Discord copié! Collez-le à vos amis.');
+    }
+  }
 
-            // Ajouter le nouveau participant
-            const newParticipant = {
-                name: discordName,
-                character: character,
-                level: level,
-                points: 0,
-                wins: 0,
-                matches: 0,
-                registrationDate: new Date().toISOString()
-            };
+  function showMatchDetails(matchId) {
+    const details = [
+      "SonGoku (SSJ3) vs Vegeta (SSG)\n📍 Stage: Namek\n⏰ Prévu: 20:00",
+      "Freezer (Final) vs Cell (Parfait)\n📍 Stage: Cell Games\n🔥 En cours!",
+      "Boo (Maléfique) vs Sangohan (Ultimate)\n🎊 Terminé: Boo gagne 3-2"
+    ];
+    
+    alert(`📋 DÉTAILS MATCH ${matchId}:\n${details[matchId-1]}`);
+  }
 
-            participants.push(newParticipant);
-            localStorage.setItem('tournamentParticipants', JSON.stringify(participants));
-            
-            showNotification(`Bienvenue ${discordName} ! Vous êtes inscrit au tournoi.`);
-            registrationForm.reset();
-            
-            displayParticipants();
-            updateLeaderboard();
-        });
+  function animateCounter(elementId, start, end, duration) {
+    const element = document.getElementById(elementId);
+    let startTimestamp = null;
+    
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const value = Math.floor(progress * (end - start) + start);
+      
+      element.textContent = value;
+      
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    
+    window.requestAnimationFrame(step);
+  }
 
-        // Fonctions pour la gestion des matchs (pour admin)
-        function addWin(playerName) {
-            const participant = participants.find(p => p.name === playerName);
-            if (participant) {
-                participant.wins++;
-                if (participant.wins % 3 === 0) {
-                    participant.points++;
-                    showNotification(`🎉 ${playerName} gagne 1 POINT ! (${participant.points}/100)`);
-                    
-                    // Vérifier si le joueur atteint 100 points
-                    if (participant.points >= 100) {
-                        showNotification(`🏆 FÉLICITATIONS ${playerName} ! Vous avez gagné 50,000 ZENIS !`);
-                        // Réinitialiser pour un nouveau cycle
-                        participant.points = 0;
-                        participant.wins = 0;
-                    }
-                }
-                
-                localStorage.setItem('tournamentParticipants', JSON.stringify(participants));
-                displayParticipants();
-                updateLeaderboard();
-            }
-        }
-
-        // Initialisation
-        displayParticipants();
-        updateLeaderboard();
-
-        // Exemple d'ajout de victoire (à utiliser depuis la console)
-        window.addWin = addWin;
-
-        console.log('🚀 SSJ3 BOT-Z Tournoi chargé !');
-        console.log('Pour ajouter une victoire à un joueur, utilisez: addWin("PseudoDiscord")');
-    </script>
-</body>
-</html>
+  // Stats auto-update every 30 seconds
+  setInterval(() => {
+    const randomUpdate = Math.floor(Math.random() * 10) + 1;
+    const current = parseInt(document.getElementById('battleCount').textContent);
+    document.getElementById('battleCount').textContent = current + randomUpdate;
+  }, 30000);
+</script>
